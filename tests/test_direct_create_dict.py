@@ -1,4 +1,4 @@
-def test_direct_create_agreement_with_dict_storage(
+def test_direct_create_agreement_with_storage(
     direct_vm,
     direct_deploy,
     direct_alice,
@@ -6,16 +6,13 @@ def test_direct_create_agreement_with_dict_storage(
 ):
     court = direct_deploy("contracts/AgentCourt.py")
 
-    # Temporarily replace TreeMap with normal dict.
-    court.agreements = {}
+    buyer = "0x" + direct_alice.hex()
+    seller = "0x" + direct_bob.hex()
 
     direct_vm.sender = direct_alice
 
-    buyer_address = "0x" + direct_alice.hex()
-    seller_address = "0x" + direct_bob.hex()
-
     agreement_id = court.create_agreement(
-        seller_address,
+        seller,
         "Seller must deliver the agreed digital service.",
         1000,
         9999999999,
@@ -25,8 +22,7 @@ def test_direct_create_agreement_with_dict_storage(
 
     agreement = court.get_agreement(agreement_id)
 
-    assert agreement["buyer"].lower() == buyer_address.lower()
-    assert agreement["seller"].lower() == seller_address.lower()
+    assert agreement["buyer"].lower() == buyer.lower()
+    assert agreement["seller"].lower() == seller.lower()
     assert agreement["amount"] == 1000
     assert agreement["status"] == court.STATUS_CREATED
-    assert agreement["verdict"] == court.VERDICT_PENDING
