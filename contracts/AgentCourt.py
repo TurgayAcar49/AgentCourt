@@ -286,7 +286,7 @@ Return JSON with exactly these fields:
         self.agreement_status[key] = self.STATUS_RESOLVED
 
     @gl.public.write
-    def settle(self, agreement_id: int) -> dict:
+    def settle(self, agreement_id: int) -> dict[str, typing.Any]:
 
         key = self._key(agreement_id)
 
@@ -317,7 +317,7 @@ Return JSON with exactly these fields:
         }
 
     @gl.public.view
-    def get_agreement(self, agreement_id: int) -> dict:
+    def get_agreement(self, agreement_id: int) -> dict[str, typing.Any]:
 
         key = self._key(agreement_id)
 
