@@ -1,26 +1,7 @@
+# v0.3.0
+
 from genlayer import *
 import typing
-from dataclasses import dataclass
-
-
-@allow_storage
-@dataclass
-class Agreement:
-    buyer: str
-    seller: str
-    terms: str
-    amount: bigint
-    deadline: bigint
-    evidence: str
-    seller_claim: str
-    buyer_claim: str
-    verdict: str
-    completion_percent: bigint
-    confidence: bigint
-    evidence_summary: str
-    reasoning: str
-    status: str
-    settled: bool
 
 
 class AgentCourt(gl.Contract):
@@ -30,10 +11,25 @@ class AgentCourt(gl.Contract):
     # ---------------------------------------------------------
 
     next_agreement_id: bigint
-    agreements: TreeMap[str, Agreement]
+
+    agreement_buyer: TreeMap[str, str]
+    agreement_seller: TreeMap[str, str]
+    agreement_terms: TreeMap[str, str]
+    agreement_amount: TreeMap[str, bigint]
+    agreement_deadline: TreeMap[str, bigint]
+    agreement_evidence: TreeMap[str, str]
+    agreement_seller_claim: TreeMap[str, str]
+    agreement_buyer_claim: TreeMap[str, str]
+    agreement_verdict: TreeMap[str, str]
+    agreement_completion: TreeMap[str, bigint]
+    agreement_confidence: TreeMap[str, bigint]
+    agreement_evidence_summary: TreeMap[str, str]
+    agreement_reasoning: TreeMap[str, str]
+    agreement_status: TreeMap[str, str]
+    agreement_settled: TreeMap[str, bool]
 
     # ---------------------------------------------------------
-    # Agreement status
+    # Status
     # ---------------------------------------------------------
 
     STATUS_CREATED = "CREATED"
@@ -45,7 +41,7 @@ class AgentCourt(gl.Contract):
     STATUS_SETTLED = "SETTLED"
 
     # ---------------------------------------------------------
-    # Verdicts
+    # Verdict
     # ---------------------------------------------------------
 
     VERDICT_PENDING = "PENDING"
@@ -57,9 +53,9 @@ class AgentCourt(gl.Contract):
     def __init__(self):
         self.next_agreement_id = 1
 
-    # =========================================================
-    # CREATE AGREEMENT
-    # =========================================================
+    # ---------------------------------------------------------
+    # Create
+    # ---------------------------------------------------------
 
     @gl.public.write
     def create_agreement(
@@ -67,7 +63,7 @@ class AgentCourt(gl.Contract):
         seller: str,
         terms: str,
         amount: int,
-        deadline: int,
+        deadline: int
     ) -> int:
 
         if not seller:
@@ -83,137 +79,139 @@ class AgentCourt(gl.Contract):
             raise gl.vm.UserError("INVALID_DEADLINE")
 
         agreement_id = int(self.next_agreement_id)
+        key = str(agreement_id)
+
         self.next_agreement_id += 1
 
-        self.agreements[str(agreement_id)] = Agreement(
-            buyer=str(gl.message.sender_address).lower(),
-            seller=seller,
-            terms=terms,
-            amount=amount,
-            deadline=deadline,
-            evidence="",
-            seller_claim="",
-            buyer_claim="",
-            verdict=self.VERDICT_PENDING,
-            completion_percent=0,
-            confidence=0,
-            evidence_summary="",
-            reasoning="",
-            status=self.STATUS_CREATED,
-            settled=False,
-        )
+        self.agreement_buyer[key] = str(
+            gl.message.sender_address
+        ).lower()
+
+        self.agreement_seller[key] = seller
+        self.agreement_terms[key] = terms
+        self.agreement_amount[key] = amount
+        self.agreement_deadline[key] = deadline
+
+        self.agreement_evidence[key] = ""
+        self.agreement_seller_claim[key] = ""
+        self.agreement_buyer_claim[key] = ""
+
+        self.agreement_verdict[key] = self.VERDICT_PENDING
+        self.agreement_completion[key] = 0
+        self.agreement_confidence[key] = 0
+
+        self.agreement_evidence_summary[key] = ""
+        self.agreement_reasoning[key] = ""
+
+        self.agreement_status[key] = self.STATUS_CREATED
+        self.agreement_settled[key] = False
 
         return agreement_id
 
-    # =========================================================
-    # FUND AGREEMENT
-    # =========================================================
+    # ---------------------------------------------------------
+    # Fund
+    # ---------------------------------------------------------
 
     @gl.public.write
     def fund_agreement(self, agreement_id: int) -> None:
 
-        agreement = self._get_agreement(agreement_id)
+        key = self._key(agreement_id)
 
-        if agreement.status != self.STATUS_CREATED:
+        status = self.agreement_status[key]
+
+        if status != self.STATUS_CREATED:
             raise gl.vm.UserError("INVALID_STATUS")
 
         sender = str(gl.message.sender_address).lower()
 
-        if sender != agreement.buyer.lower():
+        if sender != self.agreement_buyer[key].lower():
             raise gl.vm.UserError("ONLY_BUYER")
 
-        agreement.status = self.STATUS_FUNDED
-        self.agreements[str(agreement_id)] = agreement
+        self.agreement_status[key] = self.STATUS_FUNDED
 
-    # =========================================================
-    # SUBMIT DELIVERY
-    # =========================================================
+    # ---------------------------------------------------------
+    # Delivery
+    # ---------------------------------------------------------
 
     @gl.public.write
     def submit_delivery(
         self,
         agreement_id: int,
         evidence: str,
-        seller_claim: str,
+        seller_claim: str
     ) -> None:
 
-        agreement = self._get_agreement(agreement_id)
+        key = self._key(agreement_id)
 
-        if agreement.status != self.STATUS_FUNDED:
+        if self.agreement_status[key] != self.STATUS_FUNDED:
             raise gl.vm.UserError("INVALID_STATUS")
 
         sender = str(gl.message.sender_address).lower()
 
-        if sender != agreement.seller.lower():
+        if sender != self.agreement_seller[key].lower():
             raise gl.vm.UserError("ONLY_SELLER")
 
         if not evidence:
             raise gl.vm.UserError("MISSING_EVIDENCE")
 
-        agreement.evidence = evidence
-        agreement.seller_claim = seller_claim
-        agreement.status = self.STATUS_DELIVERED
+        self.agreement_evidence[key] = evidence
+        self.agreement_seller_claim[key] = seller_claim
+        self.agreement_status[key] = self.STATUS_DELIVERED
 
-        self.agreements[str(agreement_id)] = agreement
-
-    # =========================================================
-    # OPEN DISPUTE
-    # =========================================================
+    # ---------------------------------------------------------
+    # Dispute
+    # ---------------------------------------------------------
 
     @gl.public.write
     def open_dispute(
         self,
         agreement_id: int,
-        buyer_claim: str,
+        buyer_claim: str
     ) -> None:
 
-        agreement = self._get_agreement(agreement_id)
+        key = self._key(agreement_id)
 
-        if agreement.status != self.STATUS_DELIVERED:
+        if self.agreement_status[key] != self.STATUS_DELIVERED:
             raise gl.vm.UserError("INVALID_STATUS")
 
         sender = str(gl.message.sender_address).lower()
 
-        if sender != agreement.buyer.lower():
+        if sender != self.agreement_buyer[key].lower():
             raise gl.vm.UserError("ONLY_BUYER")
 
         if not buyer_claim:
             raise gl.vm.UserError("MISSING_BUYER_CLAIM")
 
-        agreement.buyer_claim = buyer_claim
-        agreement.status = self.STATUS_DISPUTED
+        self.agreement_buyer_claim[key] = buyer_claim
+        self.agreement_status[key] = self.STATUS_DISPUTED
 
-        self.agreements[str(agreement_id)] = agreement
-
-    # =========================================================
-    # GENLAYER ADJUDICATION
-    # =========================================================
+    # ---------------------------------------------------------
+    # Adjudication
+    # ---------------------------------------------------------
 
     @gl.public.write
     def adjudicate(self, agreement_id: int) -> typing.Any:
 
-        agreement = self._get_agreement(agreement_id)
+        key = self._key(agreement_id)
 
-        if agreement.status != self.STATUS_DISPUTED:
+        if self.agreement_status[key] != self.STATUS_DISPUTED:
             raise gl.vm.UserError("INVALID_STATUS")
 
-        agreement.status = self.STATUS_ADJUDICATING
-        self.agreements[str(agreement_id)] = agreement
+        self.agreement_status[key] = self.STATUS_ADJUDICATING
 
-        # Extract storage values into normal memory before entering
-        # the nondeterministic execution.
-        terms = agreement.terms
-        seller_claim = agreement.seller_claim
-        buyer_claim = agreement.buyer_claim
-        evidence = agreement.evidence
+        terms = self.agreement_terms[key]
+        seller_claim = self.agreement_seller_claim[key]
+        buyer_claim = self.agreement_buyer_claim[key]
+        evidence = self.agreement_evidence[key]
 
         def leader_fn():
 
             prompt = f"""
-You are the decentralized adjudicator for an agent-to-agent
-commerce agreement.
+You are the decentralized adjudicator for an
+agent-to-agent commerce agreement.
 
-Determine whether the seller fulfilled the contractual obligations.
+Determine whether the seller fulfilled the contractual
+obligations.
 
 Do NOT guess.
 Use ONLY the agreement terms and submitted evidence.
@@ -233,7 +231,8 @@ EVIDENCE:
 Return ONLY valid JSON:
 
 {{
-    "verdict": "FULFILLED | PARTIALLY_FULFILLED | NOT_FULFILLED | UNDETERMINED",
+    "verdict":
+        "FULFILLED | PARTIALLY_FULFILLED | NOT_FULFILLED | UNDETERMINED",
     "completion_percent": 0,
     "confidence": 0,
     "evidence_summary": "...",
@@ -242,19 +241,19 @@ Return ONLY valid JSON:
 
 Rules:
 
-- FULFILLED means the evidence supports complete fulfillment.
-- PARTIALLY_FULFILLED means the evidence supports incomplete but
-  meaningful fulfillment.
-- NOT_FULFILLED means the evidence supports failure to fulfill.
-- UNDETERMINED means the evidence is insufficient or contradictory.
-- completion_percent must be between 0 and 100.
-- confidence must be between 0 and 100.
+- FULFILLED means evidence supports complete fulfillment.
+- PARTIALLY_FULFILLED means evidence supports incomplete
+  but meaningful fulfillment.
+- NOT_FULFILLED means evidence supports failure.
+- UNDETERMINED means evidence is insufficient or contradictory.
+- completion_percent must be 0 to 100.
+- confidence must be 0 to 100.
 - Never invent evidence.
 """
 
             return gl.nondet.exec_prompt(
                 prompt,
-                response_format="json",
+                response_format="json"
             )
 
         def validator_fn(result):
@@ -283,9 +282,11 @@ Rules:
                 completion = int(
                     data.get("completion_percent", 0)
                 )
+
                 confidence = int(
                     data.get("confidence", 0)
                 )
+
             except (TypeError, ValueError):
                 return False
 
@@ -297,13 +298,13 @@ Rules:
 
             if not isinstance(
                 data.get("evidence_summary", ""),
-                str,
+                str
             ):
                 return False
 
             if not isinstance(
                 data.get("reasoning", ""),
-                str,
+                str
             ):
                 return False
 
@@ -311,7 +312,7 @@ Rules:
 
         result = gl.vm.run_nondet(
             leader_fn,
-            validator_fn,
+            validator_fn
         )
 
         if not isinstance(result, dict):
@@ -332,6 +333,7 @@ Rules:
         completion = int(
             result.get("completion_percent", 0)
         )
+
         confidence = int(
             result.get("confidence", 0)
         )
@@ -342,88 +344,104 @@ Rules:
         if confidence < 0 or confidence > 100:
             raise gl.vm.UserError("INVALID_CONFIDENCE")
 
-        agreement.verdict = verdict
-        agreement.completion_percent = completion
-        agreement.confidence = confidence
-        agreement.evidence_summary = str(
+        self.agreement_verdict[key] = verdict
+        self.agreement_completion[key] = completion
+        self.agreement_confidence[key] = confidence
+
+        self.agreement_evidence_summary[key] = str(
             result.get("evidence_summary", "")
         )
-        agreement.reasoning = str(
+
+        self.agreement_reasoning[key] = str(
             result.get("reasoning", "")
         )
-        agreement.status = self.STATUS_RESOLVED
 
-        self.agreements[str(agreement_id)] = agreement
+        self.agreement_status[key] = self.STATUS_RESOLVED
 
         return result
 
-    # =========================================================
-    # SETTLEMENT
-    # =========================================================
+    # ---------------------------------------------------------
+    # Settlement
+    # ---------------------------------------------------------
 
     @gl.public.write
     def settle(self, agreement_id: int) -> typing.Any:
 
-        agreement = self._get_agreement(agreement_id)
+        key = self._key(agreement_id)
 
-        if agreement.settled:
+        if self.agreement_settled[key]:
             raise gl.vm.UserError("ALREADY_SETTLED")
 
-        if agreement.status != self.STATUS_RESOLVED:
+        if self.agreement_status[key] != self.STATUS_RESOLVED:
             raise gl.vm.UserError("NOT_RESOLVED")
 
-        completion = int(agreement.completion_percent)
-        amount = int(agreement.amount)
+        completion = int(
+            self.agreement_completion[key]
+        )
 
-        seller_amount = amount * completion // 100
-        buyer_refund = amount - seller_amount
+        amount = int(
+            self.agreement_amount[key]
+        )
 
-        agreement.settled = True
-        agreement.status = self.STATUS_SETTLED
+        seller_amount = (
+            amount * completion // 100
+        )
 
-        self.agreements[str(agreement_id)] = agreement
+        buyer_refund = (
+            amount - seller_amount
+        )
+
+        self.agreement_settled[key] = True
+        self.agreement_status[key] = self.STATUS_SETTLED
 
         return {
             "seller_amount": seller_amount,
             "buyer_refund": buyer_refund,
-            "verdict": agreement.verdict,
+            "verdict": self.agreement_verdict[key],
         }
 
-    # =========================================================
-    # VIEW
-    # =========================================================
+    # ---------------------------------------------------------
+    # Read
+    # ---------------------------------------------------------
 
     @gl.public.view
-    def get_agreement(self, agreement_id: int) -> dict:
-        agreement = self._get_agreement(agreement_id)
+    def get_agreement(
+        self,
+        agreement_id: int
+    ) -> dict:
+
+        key = self._key(agreement_id)
 
         return {
-            "buyer": agreement.buyer,
-            "seller": agreement.seller,
-            "terms": agreement.terms,
-            "amount": int(agreement.amount),
-            "deadline": int(agreement.deadline),
-            "evidence": agreement.evidence,
-            "seller_claim": agreement.seller_claim,
-            "buyer_claim": agreement.buyer_claim,
-            "verdict": agreement.verdict,
-            "completion_percent": int(agreement.completion_percent),
-            "confidence": int(agreement.confidence),
-            "evidence_summary": agreement.evidence_summary,
-            "reasoning": agreement.reasoning,
-            "status": agreement.status,
-            "settled": agreement.settled,
+            "agreement_id": agreement_id,
+            "buyer": self.agreement_buyer[key],
+            "seller": self.agreement_seller[key],
+            "terms": self.agreement_terms[key],
+            "amount": self.agreement_amount[key],
+            "deadline": self.agreement_deadline[key],
+            "evidence": self.agreement_evidence[key],
+            "seller_claim": self.agreement_seller_claim[key],
+            "buyer_claim": self.agreement_buyer_claim[key],
+            "verdict": self.agreement_verdict[key],
+            "completion_percent": self.agreement_completion[key],
+            "confidence": self.agreement_confidence[key],
+            "evidence_summary": self.agreement_evidence_summary[key],
+            "reasoning": self.agreement_reasoning[key],
+            "status": self.agreement_status[key],
+            "settled": self.agreement_settled[key],
         }
 
-    # =========================================================
-    # INTERNAL HELPERS
-    # =========================================================
+    # ---------------------------------------------------------
+    # Internal helpers
+    # ---------------------------------------------------------
 
-    def _get_agreement(self, agreement_id: int) -> Agreement:
+    def _key(self, agreement_id: int) -> str:
 
         key = str(agreement_id)
 
-        if key not in self.agreements:
-            raise gl.vm.UserError("AGREEMENT_NOT_FOUND")
+        if key not in self.agreement_status:
+            raise gl.vm.UserError(
+                "AGREEMENT_NOT_FOUND"
+            )
 
-        return self.agreements[key]
+        return key
