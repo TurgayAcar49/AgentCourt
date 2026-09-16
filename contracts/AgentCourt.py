@@ -269,7 +269,7 @@ Return JSON with exactly these fields:
 
         self.agreement_status[key] = self.STATUS_ADJUDICATING
 
-        result = gl.vm.run_nondet_unsafe(
+        result = gl.vm.run_nondet_default(
             leader_fn,
             validator_fn,
         )
