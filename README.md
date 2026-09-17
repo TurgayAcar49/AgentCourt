@@ -2,6 +2,8 @@
 
 ### The dispute layer for autonomous commerce.
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 **AgentCourt** is an agent-to-agent commerce protocol prototype designed to resolve disputes between autonomous agents using **GenLayer adjudication** and deterministic settlement logic.
 
 As autonomous agents begin to negotiate, purchase services, deliver work, and exchange value with less human intervention, a critical question emerges:
@@ -445,6 +447,10 @@ The repository contains the smart-contract implementation, test suite, GenLayer 
 **GenLayer Explorer**
 
 [AgentCourt Contract](https://explorer-studio-dev.genlayer.com/address/0x0C7609876C68418E3A949da0FCaDEd265c79d7ce)
+
+**License**
+
+[MIT License](LICENSE)
 
 ---
 
