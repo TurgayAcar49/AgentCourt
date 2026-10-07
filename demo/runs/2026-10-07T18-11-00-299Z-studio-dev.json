@@ -1,0 +1,297 @@
+{
+  "network": "studio-dev",
+  "chainId": 61997,
+  "rpc": "https://studio-dev.genlayer.com/api",
+  "startedAt": "2026-10-07T18:11:00.299Z",
+  "buyer": "0x5071803e012fB51AfDb9f558b4E38C71cB6db297",
+  "seller": "0xF4B3C54d0E29f5f6c4D058f4f759be815a7C63E8",
+  "contract": "0xa071AB5acedC606F9Fb7557c52803a6Bf4738Bb0",
+  "transactions": [
+    {
+      "label": "partial: create_agreement",
+      "role": "buyer",
+      "hash": "0xb1e408bb495363ccbcde46e7f83ca64f188bfe8153ada33d38db0abdda35ae06",
+      "status": 5,
+      "execution": "FINISHED_WITH_RETURN",
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "2"
+        }
+      },
+      "votes": {
+        "agree": 3,
+        "disagree": 0,
+        "total": 3
+      }
+    },
+    {
+      "label": "partial: fund_agreement",
+      "role": "buyer",
+      "hash": "0xf91575c9a66b99d79230d79c5dfee8a5bb3273fa909fb7552860e92be6caab32",
+      "status": 5,
+      "execution": "FINISHED_WITH_RETURN",
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "null"
+        }
+      },
+      "votes": {
+        "agree": 3,
+        "disagree": 0,
+        "total": 3
+      }
+    },
+    {
+      "label": "partial: submit_delivery",
+      "role": "seller",
+      "hash": "0x5a8c6ffba9f61eec2e6e66452df192342612fec3b1fa88a875c4dffc1a30b6ab",
+      "status": 5,
+      "execution": "FINISHED_WITH_RETURN",
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "null"
+        }
+      },
+      "votes": {
+        "agree": 3,
+        "disagree": 0,
+        "total": 3
+      }
+    },
+    {
+      "label": "partial: open_dispute",
+      "role": "buyer",
+      "hash": "0x8fe5cedc7f28ab98394851a1a96ad857183feb83630adbc72cc2878bf461dc48",
+      "status": 5,
+      "execution": "FINISHED_WITH_RETURN",
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "null"
+        }
+      },
+      "votes": {
+        "agree": 3,
+        "disagree": 0,
+        "total": 3
+      }
+    },
+    {
+      "label": "partial: adjudicate",
+      "role": "buyer",
+      "hash": "0x3b2f5339ea6f6c3bf0880804e1740145e5fbf3e24e86700e48ed50adb0f1d115",
+      "status": 5,
+      "execution": "FINISHED_WITH_RETURN",
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "{\"completion_percent\":70\"confidence\":95\"evidence_summary\":\"The submitted report covers 14 companies, which is 6 short of the required 20. For the 14 companies covered, all required fields (founding year, headquarters, main product, pricing model) are present. However, the 'key differentiator' field is missing for 5 of the 14 companies. The report does include a ranked shortlist of the top 5 companies.\"\"reasoning\":\"The agreement required a report covering exactly 20 companies with five specific data points each, and a ranked shortlist of the top 5. The delivered report only covers 14 companies (70% of the quantity requirement). For the covered companies, the data is mostly complete, with only one of the five required fields missing for 5 companies. The shortlist is provided. Therefore, the agreement is meaningfully but incompletely fulfilled. The completion percentage is calculated based on the primary requirement of covering 20 companies (14/20 = 70%). The missing 'key differentiator' for some companies slightly reduces the quality of the delivered portion but does not warrant a further reduction in the primary scope metric. The evidence is clear and uncontradicted.\"\"verdict\":\"PARTIALLY_FULFILLED\"}"
+        }
+      },
+      "votes": {
+        "agree": 3,
+        "disagree": 0,
+        "total": 3
+      }
+    },
+    {
+      "label": "partial: settle",
+      "role": "buyer",
+      "hash": "0x6f22c15a718a05e0db4f77951414a54b9e954d05929ec4398626f7c947b87eba",
+      "status": 5,
+      "execution": "FINISHED_WITH_RETURN",
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "{\"buyer_refund\":300\"resolution\":\"ADJUDICATED\"\"seller_amount\":700\"verdict\":\"PARTIALLY_FULFILLED\"}"
+        }
+      },
+      "votes": {
+        "agree": 3,
+        "disagree": 0,
+        "total": 3
+      }
+    },
+    {
+      "label": "web: create_agreement",
+      "role": "buyer",
+      "hash": "0x0cf39a965851e458789a0f59271619c0a0b998ea66354e7845fa5b3e06800a7a",
+      "status": 5,
+      "execution": "FINISHED_WITH_RETURN",
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "3"
+        }
+      },
+      "votes": {
+        "agree": 3,
+        "disagree": 0,
+        "total": 3
+      }
+    },
+    {
+      "label": "web: fund_agreement",
+      "role": "buyer",
+      "hash": "0xd1f5f79219376b65d09d8f61c7dcdddc6e2d661c16d45d871c5b5a83cb9525c5",
+      "status": 5,
+      "execution": "FINISHED_WITH_RETURN",
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "null"
+        }
+      },
+      "votes": {
+        "agree": 3,
+        "disagree": 0,
+        "total": 3
+      }
+    },
+    {
+      "label": "web: submit_delivery",
+      "role": "seller",
+      "hash": "0x734a0883896121e510fea8cdef9d1eddfd1c6d695b360930de9ffb506934db72",
+      "status": 5,
+      "execution": "FINISHED_WITH_RETURN",
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "null"
+        }
+      },
+      "votes": {
+        "agree": 3,
+        "disagree": 0,
+        "total": 3
+      }
+    },
+    {
+      "label": "web: open_dispute",
+      "role": "buyer",
+      "hash": "0x1d4ff8f573b71c8064ecba934ae9e6bed0f3156c63fb0c809bbd8b4a88090da1",
+      "status": 5,
+      "execution": "FINISHED_WITH_RETURN",
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "null"
+        }
+      },
+      "votes": {
+        "agree": 3,
+        "disagree": 0,
+        "total": 3
+      }
+    },
+    {
+      "label": "web: adjudicate",
+      "role": "buyer",
+      "hash": "0x01a1864c90bf9f17c040b5af7141775b6400d1fbe0b589a6b807628dcbf7b276",
+      "status": 5,
+      "execution": "FINISHED_WITH_RETURN",
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "{\"completion_percent\":0\"confidence\":97\"evidence_summary\":\"The fetched page at https://example.com is the standard IANA example domain placeholder page. It contains no pricing information, no subscription tiers, no tier names (Starter, Growth, Enterprise), and no prices in EUR or any other currency. It is a generic documentation placeholder, not a pricing page.\"\"reasoning\":\"The agreement requires a public pricing page listing three subscription tiers (Starter, Growth, Enterprise) each with a monthly price in EUR. The seller claimed this page is live at https://example.com. The fetched content of that URL is unambiguously the IANA/ICANN example domain placeholder, which exists solely for documentation examples and contains no service-related content whatsoever. There is zero evidence of any pricing tier, tier name, or price on the page. The buyer's dispute is confirmed by the fetched evidence. The seller has not fulfilled any part of the agreement.\"\"verdict\":\"NOT_FULFILLED\"}"
+        }
+      },
+      "votes": {
+        "agree": 3,
+        "disagree": 0,
+        "total": 3
+      }
+    },
+    {
+      "label": "web: settle",
+      "role": "buyer",
+      "hash": "0x69576447c02b537a2a34b9b8c2217647160cb49c5299f54e427eb5ee3dc8fc12",
+      "status": 5,
+      "execution": "FINISHED_WITH_RETURN",
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "{\"buyer_refund\":500\"resolution\":\"ADJUDICATED\"\"seller_amount\":0\"verdict\":\"NOT_FULFILLED\"}"
+        }
+      },
+      "votes": {
+        "agree": 3,
+        "disagree": 0,
+        "total": 3
+      }
+    }
+  ],
+  "scenarios": [
+    {
+      "name": "partial",
+      "title": "Disputed delivery, partially fulfilled",
+      "agreementId": 2,
+      "settlement": "{\"buyer_refund\":300\"resolution\":\"ADJUDICATED\"\"seller_amount\":700\"verdict\":\"PARTIALLY_FULFILLED\"}",
+      "agreement": {
+        "amount": 1000,
+        "buyer": "0x5071803e012fb51afdb9f558b4e38c71cb6db297",
+        "buyer_claim": "Only 14 of the 20 required companies are covered and 5 of those are missing the key differentiator. The agreement was not fully delivered.",
+        "completion_percent": 70,
+        "confidence": 95,
+        "deadline": 1792001465,
+        "delivered_at": 1791396843,
+        "evidence": "Competitive analysis report - European B2B payments (delivered by seller agent)\n\nCompanies covered (14): Adyen, Mollie, Checkout.com, GoCardless, Klarna, Stripe Europe,\nWorldline, Nexi, Paysafe, Trustly, SumUp, Payhawk, Pleo, Rapyd Europe.\n\nEach of the 14 entries lists founding year, headquarters, main product and pricing model.\nKey differentiators are given for 9 of the 14 companies.\n\nRanked shortlist: 1. Adyen 2. Checkout.com 3. Mollie 4. GoCardless 5. Trustly.\n\nNot included: the remaining 6 companies were not researched before the deadline.",
+        "evidence_summary": "The submitted report covers 14 companies, which is 6 short of the required 20. For the 14 companies covered, all required fields (founding year, headquarters, main product, pricing model) are present. However, the 'key differentiator' field is missing for 5 of the 14 companies. The report does include a ranked shortlist of the top 5 companies.",
+        "reasoning": "The agreement required a report covering exactly 20 companies with five specific data points each, and a ranked shortlist of the top 5. The delivered report only covers 14 companies (70% of the quantity requirement). For the covered companies, the data is mostly complete, with only one of the five required fields missing for 5 companies. The shortlist is provided. Therefore, the agreement is meaningfully but incompletely fulfilled. The completion percentage is calculated based on the primary requirement of covering 20 companies (14/20 = 70%). The missing 'key differentiator' for some companies slightly reduces the quality of the delivered portion but does not warrant a further reduction in the primary scope metric. The evidence is clear and uncontradicted.",
+        "resolution": "ADJUDICATED",
+        "seller": "0xf4b3c54d0e29f5f6c4d058f4f759be815a7c63e8",
+        "seller_claim": "The report was delivered on time and covers the most important companies in the market, so the agreement is substantially fulfilled.",
+        "settled": true,
+        "status": "SETTLED",
+        "terms": "Deliver a competitive analysis report covering exactly 20 named companies in the European B2B payments market. For each company the report must include: founding year, headquarters, main product, pricing model and one key differentiator. The report must end with a ranked shortlist of the top 5 companies.",
+        "verdict": "PARTIALLY_FULFILLED"
+      },
+      "transactions": [
+        "0xb1e408bb495363ccbcde46e7f83ca64f188bfe8153ada33d38db0abdda35ae06",
+        "0xf91575c9a66b99d79230d79c5dfee8a5bb3273fa909fb7552860e92be6caab32",
+        "0x5a8c6ffba9f61eec2e6e66452df192342612fec3b1fa88a875c4dffc1a30b6ab",
+        "0x8fe5cedc7f28ab98394851a1a96ad857183feb83630adbc72cc2878bf461dc48",
+        "0x3b2f5339ea6f6c3bf0880804e1740145e5fbf3e24e86700e48ed50adb0f1d115",
+        "0x6f22c15a718a05e0db4f77951414a54b9e954d05929ec4398626f7c947b87eba"
+      ]
+    },
+    {
+      "name": "web",
+      "title": "Disputed delivery checked against the live web page",
+      "agreementId": 3,
+      "settlement": "{\"buyer_refund\":500\"resolution\":\"ADJUDICATED\"\"seller_amount\":0\"verdict\":\"NOT_FULFILLED\"}",
+      "agreement": {
+        "amount": 500,
+        "buyer": "0x5071803e012fb51afdb9f558b4e38c71cb6db297",
+        "buyer_claim": "The URL does not show any pricing tiers. The seller did not publish the page.",
+        "completion_percent": 0,
+        "confidence": 97,
+        "deadline": 1792001880,
+        "delivered_at": 1791397143,
+        "evidence": "The pricing page is live at https://example.com",
+        "evidence_summary": "The fetched page at https://example.com is the standard IANA example domain placeholder page. It contains no pricing information, no subscription tiers, no tier names (Starter, Growth, Enterprise), and no prices in EUR or any other currency. It is a generic documentation placeholder, not a pricing page.",
+        "reasoning": "The agreement requires a public pricing page listing three subscription tiers (Starter, Growth, Enterprise) each with a monthly price in EUR. The seller claimed this page is live at https://example.com. The fetched content of that URL is unambiguously the IANA/ICANN example domain placeholder, which exists solely for documentation examples and contains no service-related content whatsoever. There is zero evidence of any pricing tier, tier name, or price on the page. The buyer's dispute is confirmed by the fetched evidence. The seller has not fulfilled any part of the agreement.",
+        "resolution": "ADJUDICATED",
+        "seller": "0xf4b3c54d0e29f5f6c4d058f4f759be815a7c63e8",
+        "seller_claim": "The pricing page with all three tiers has been published at the URL above.",
+        "settled": true,
+        "status": "SETTLED",
+        "terms": "Publish a public pricing page that lists three subscription tiers named Starter, Growth and Enterprise, each with a monthly price in EUR.",
+        "verdict": "NOT_FULFILLED"
+      },
+      "transactions": [
+        "0x0cf39a965851e458789a0f59271619c0a0b998ea66354e7845fa5b3e06800a7a",
+        "0xd1f5f79219376b65d09d8f61c7dcdddc6e2d661c16d45d871c5b5a83cb9525c5",
+        "0x734a0883896121e510fea8cdef9d1eddfd1c6d695b360930de9ffb506934db72",
+        "0x1d4ff8f573b71c8064ecba934ae9e6bed0f3156c63fb0c809bbd8b4a88090da1",
+        "0x01a1864c90bf9f17c040b5af7141775b6400d1fbe0b589a6b807628dcbf7b276",
+        "0x69576447c02b537a2a34b9b8c2217647160cb49c5299f54e427eb5ee3dc8fc12"
+      ]
+    }
+  ],
+  "finishedAt": "2026-10-07T18:20:17.199Z",
+  "explorer": "https://explorer-studio-dev.genlayer.com/address/0xa071AB5acedC606F9Fb7557c52803a6Bf4738Bb0"
+}

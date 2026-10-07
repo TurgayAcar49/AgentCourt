@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "demo": "node scripts/demo.mjs"
+    "demo": "node scripts/demo.mjs",
+    "report": "node scripts/report.mjs"
   },
   "dependencies": {
     "genlayer-js": "2.0.0-rc.1"

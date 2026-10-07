@@ -1,0 +1,155 @@
+{
+  "network": "studio-dev",
+  "chainId": 61997,
+  "rpc": "https://studio-dev.genlayer.com/api",
+  "startedAt": "2026-10-07T18:09:52.328Z",
+  "buyer": "0x5071803e012fB51AfDb9f558b4E38C71cB6db297",
+  "seller": "0xF4B3C54d0E29f5f6c4D058f4f759be815a7C63E8",
+  "contract": "0xa071AB5acedC606F9Fb7557c52803a6Bf4738Bb0",
+  "transactions": [
+    {
+      "label": "deploy AgentCourt",
+      "role": "buyer",
+      "hash": "0x1b435778734e95e29039addd8fd29f70d1092a610e56939564b638c6d28debac",
+      "status": 5,
+      "execution": "FINISHED_WITH_RETURN",
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "null"
+        }
+      },
+      "votes": {
+        "agree": 3,
+        "disagree": 0,
+        "total": 3
+      }
+    },
+    {
+      "label": "accept: create_agreement",
+      "role": "buyer",
+      "hash": "0x994b30024255d273c526a33603c4aece3bf7393680bd555af5079fc3dee685a8",
+      "status": 5,
+      "execution": "FINISHED_WITH_RETURN",
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "1"
+        }
+      },
+      "votes": {
+        "agree": 3,
+        "disagree": 0,
+        "total": 3
+      }
+    },
+    {
+      "label": "accept: fund_agreement",
+      "role": "buyer",
+      "hash": "0xb4fa2f1d398f42d471a86f872e0eeaf96c2b0dbc91331e3f0e75a4b13b155b25",
+      "status": 5,
+      "execution": "FINISHED_WITH_RETURN",
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "null"
+        }
+      },
+      "votes": {
+        "agree": 3,
+        "disagree": 0,
+        "total": 3
+      }
+    },
+    {
+      "label": "accept: submit_delivery",
+      "role": "seller",
+      "hash": "0x93276fc5e0b342fd79be0b1e753e98491735ecd211a569f17177be154a0c3524",
+      "status": 5,
+      "execution": "FINISHED_WITH_RETURN",
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "null"
+        }
+      },
+      "votes": {
+        "agree": 3,
+        "disagree": 0,
+        "total": 3
+      }
+    },
+    {
+      "label": "accept: accept_delivery",
+      "role": "buyer",
+      "hash": "0x1b9810c493b783e8170b82f5ed0129bb02e37c2f8358d961ab58c693924a7f1a",
+      "status": 5,
+      "execution": "FINISHED_WITH_RETURN",
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "null"
+        }
+      },
+      "votes": {
+        "agree": 3,
+        "disagree": 0,
+        "total": 3
+      }
+    },
+    {
+      "label": "accept: settle",
+      "role": "buyer",
+      "hash": "0x26f55e7cfb790f7cc90dc4085c49fc2396960544203bc0f167752362132f05e7",
+      "status": 5,
+      "execution": "FINISHED_WITH_RETURN",
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "{\"buyer_refund\":0\"resolution\":\"ACCEPTED_BY_BUYER\"\"seller_amount\":200\"verdict\":\"FULFILLED\"}"
+        }
+      },
+      "votes": {
+        "agree": 3,
+        "disagree": 0,
+        "total": 3
+      }
+    }
+  ],
+  "scenarios": [
+    {
+      "name": "accept",
+      "title": "Delivery accepted by the buyer, no dispute",
+      "agreementId": 1,
+      "settlement": "{\"buyer_refund\":0\"resolution\":\"ACCEPTED_BY_BUYER\"\"seller_amount\":200\"verdict\":\"FULFILLED\"}",
+      "agreement": {
+        "amount": 200,
+        "buyer": "0x5071803e012fb51afdb9f558b4e38c71cb6db297",
+        "buyer_claim": "",
+        "completion_percent": 100,
+        "confidence": 100,
+        "deadline": 1792001399,
+        "delivered_at": 1791396617,
+        "evidence": "Turkish translation delivered: 'AgentCourt, otonom ajanlar arasındaki ticarette anlaşmazlıkları GenLayer üzerinde çözen bir protokoldür...' (full text, 312 words).",
+        "evidence_summary": "",
+        "reasoning": "The buyer accepted the delivery.",
+        "resolution": "ACCEPTED_BY_BUYER",
+        "seller": "0xf4b3c54d0e29f5f6c4d058f4f759be815a7c63e8",
+        "seller_claim": "The full translation has been delivered.",
+        "settled": true,
+        "status": "SETTLED",
+        "terms": "Translate the attached 300-word product description from English into Turkish.",
+        "verdict": "FULFILLED"
+      },
+      "transactions": [
+        "0x994b30024255d273c526a33603c4aece3bf7393680bd555af5079fc3dee685a8",
+        "0xb4fa2f1d398f42d471a86f872e0eeaf96c2b0dbc91331e3f0e75a4b13b155b25",
+        "0x93276fc5e0b342fd79be0b1e753e98491735ecd211a569f17177be154a0c3524",
+        "0x1b9810c493b783e8170b82f5ed0129bb02e37c2f8358d961ab58c693924a7f1a",
+        "0x26f55e7cfb790f7cc90dc4085c49fc2396960544203bc0f167752362132f05e7"
+      ]
+    }
+  ],
+  "finishedAt": "2026-10-07T18:10:39.260Z",
+  "explorer": "https://explorer-studio-dev.genlayer.com/address/0xa071AB5acedC606F9Fb7557c52803a6Bf4738Bb0"
+}
