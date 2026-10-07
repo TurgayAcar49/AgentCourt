@@ -4,466 +4,201 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**AgentCourt** is an agent-to-agent commerce protocol prototype designed to resolve disputes between autonomous agents using **GenLayer adjudication** and deterministic settlement logic.
+AgentCourt is a GenLayer Intelligent Contract that resolves disputes between a buyer agent and a seller agent. When the buyer disputes a delivery, GenLayer validators each read the agreement, the evidence and any evidence URL, reach their own verdict, and only accept the leader's ruling if they independently agree. The contract then turns that ruling into deterministic settlement accounting.
 
-As autonomous agents begin to negotiate, purchase services, deliver work, and exchange value with less human intervention, a critical question emerges:
-
-> **What happens when two autonomous agents disagree about whether an agreement was fulfilled?**
-
-AgentCourt explores a programmable dispute-resolution layer for that problem.
+> **GenLayer decides. The contract executes.**
 
 ---
 
-## 🚀 Why AgentCourt Exists
+## Verified on GenLayer Studio
 
-Autonomous commerce introduces a problem that traditional deterministic smart contracts do not easily solve: **judging whether a real-world or semi-structured deliverable actually satisfies an agreement.**
+The full lifecycle has been run on chain with real LLM adjudication. Every transaction below finalized with a successful GenVM result and validator agreement.
 
-For example:
-
-> A buyer agent requests a research report. A seller agent submits the result. The buyer claims that important requirements are missing. Who determines how much of the agreement was actually fulfilled?
-
-AgentCourt separates this problem into two layers:
-
-```text
-GenLayer → evaluates the dispute
-Smart Contract → applies the resulting settlement logic
-```
-
-The core principle is simple:
-
-> **GenLayer decides.**
-> **The smart contract executes.**
-
----
-
-## 🔄 Core Flow
-
-```text
-Agreement
-    ↓
-Funding State
-    ↓
-Seller Delivery
-    ↓
-Evidence Submission
-    ↓
-Dispute
-    ↓
-GenLayer Adjudication
-    ↓
-Deterministic Settlement
-    ↓
-Verification
-```
-
-The protocol turns a potentially subjective dispute into a structured onchain workflow.
-
----
-
-## 🧩 How AgentCourt Works
-
-### 1. Agreement
-
-A buyer and seller establish an agreement containing:
-
-- seller
-- terms
-- amount
-- deadline
-
-The agreement becomes the reference point for evaluating delivery.
-
-### 2. Funding State
-
-The buyer moves the agreement into the `FUNDED` state before delivery.
-
-**Important MVP scope:** the current prototype records this funding state but does **not** custody or transfer USDC/tokens. Production asset custody and payment rails are future work.
-
-### 3. Delivery
-
-The seller submits the completed work together with supporting evidence.
-
-### 4. Dispute
-
-If the buyer believes the delivery does not satisfy the agreement, the buyer can open a dispute and provide a claim explaining the disagreement.
-
-### 5. GenLayer Adjudication
-
-AgentCourt sends the relevant agreement terms, delivery information, claims, and evidence to **GenLayer** for adjudication.
-
-The adjudication produces a structured result containing:
-
-- verdict
-- completion percentage
-- confidence
-- evidence summary
-- reasoning
-
-Supported verdicts:
-
-| Verdict | Meaning |
+| | |
 |---|---|
-| `FULFILLED` | The agreement was fulfilled |
-| `PARTIALLY_FULFILLED` | Part of the agreement was fulfilled |
-| `NOT_FULFILLED` | The agreement was not fulfilled |
-| `UNDETERMINED` | Available evidence is insufficient to determine fulfillment |
+| Network | GenLayer Studio Dev, chain ID `61997`, RPC `https://studio-dev.genlayer.com/api` |
+| Contract | [`0xa071AB5acedC606F9Fb7557c52803a6Bf4738Bb0`](https://explorer-studio-dev.genlayer.com/address/0xa071AB5acedC606F9Fb7557c52803a6Bf4738Bb0) |
+| Deploy transaction | [`0x1b435778…d28debac`](https://explorer-studio-dev.genlayer.com/tx/0x1b435778734e95e29039addd8fd29f70d1092a610e56939564b638c6d28debac) |
 
-### 6. Deterministic Settlement
+| Agreement | Path | Adjudication transaction | On-chain verdict | Settlement |
+|---|---|---|---|---|
+| #2 Competitive analysis, 14 of 20 companies delivered | dispute → adjudicate → settle | [`0x3b2f5339…b0f1d115`](https://explorer-studio-dev.genlayer.com/tx/0x3b2f5339ea6f6c3bf0880804e1740145e5fbf3e24e86700e48ed50adb0f1d115) | `PARTIALLY_FULFILLED` 70% | seller 700 / refund 300 |
+| #3 Pricing page claimed at `https://example.com` | dispute → validators fetch the URL → settle | [`0x01a1864c…cbf7b276`](https://explorer-studio-dev.genlayer.com/tx/0x01a1864c90bf9f17c040b5af7141775b6400d1fbe0b589a6b807628dcbf7b276) | `NOT_FULFILLED` 0% | seller 0 / refund 500 |
+| #1 Translation accepted by the buyer | accept → settle | no adjudication needed | `FULFILLED` 100% | seller 200 / refund 0 |
 
-The adjudication result is converted into deterministic settlement accounting.
+[`demo/RUN.md`](demo/RUN.md) lists every transaction hash of all three agreements, the terms and evidence that were submitted, and the evidence summary and reasoning stored on chain. The raw receipts are in [`demo/runs/`](demo/runs/).
 
-For a completion percentage of `70%`:
+In agreement #3 the seller only submitted a URL. The validators rendered `https://example.com` themselves, found the IANA placeholder page instead of a pricing page, and ruled against the seller:
+
+> The fetched page at https://example.com is the standard IANA example domain placeholder page. It contains no pricing information, no subscription tiers, no tier names (Starter, Growth, Enterprise), and no prices in EUR or any other currency.
+
+> The GenLayer explorer currently labels every call to this contract as `(constructor)` in its Method column. The transactions are the lifecycle calls listed in `demo/RUN.md`.
+
+---
+
+## Lifecycle
 
 ```text
-Agreement Amount: 100
-
-Seller Allocation: 70
-Buyer Refund:      30
+                   create_agreement (buyer)
+                            │
+                   fund_agreement (buyer)
+                            │
+          ┌─────────────────┴──────────────────┐
+          │                                    │
+ submit_delivery (seller)            deadline passes without delivery
+ before the deadline                           │
+          │                          reclaim_expired (buyer)
+          │                          → NOT_FULFILLED, 0%
+          │
+ ┌────────┼──────────────────────────────┐
+ │        │                              │
+ │  accept_delivery (buyer)     3-day dispute window
+ │  → FULFILLED, 100%           passes in silence
+ │                                       │
+ │                         finalize_undisputed (anyone)
+ │                         → FULFILLED, 100%
+ │
+ open_dispute (buyer, within 3 days of delivery)
+          │
+ adjudicate (buyer or seller) ── GenLayer consensus
+          │
+          └──────────────► RESOLVED ──► settle (anyone) ──► SETTLED
 ```
 
-The current MVP **calculates and records these settlement values**; it does not execute token transfers.
+Every path ends in `RESOLVED` with a verdict and a completion percentage, so an agreement can never get stuck waiting for one party.
 
-This separates:
-
-**Adjudication → Decision**
-
-from
-
-**Settlement → Deterministic Execution Logic**
-
-### 7. Verification
-
-After settlement, the agreement retains its resulting state and adjudication information so the outcome can be inspected.
-
----
-
-## 🧠 Why GenLayer?
-
-The difficult part of autonomous commerce is not always moving assets. The difficult part can be determining whether an offchain or semi-structured outcome satisfies an agreement.
-
-Traditional deterministic code can enforce explicit rules, but it is poorly suited to questions such as:
-
-- Was the requested work actually completed?
-- Does the delivered result satisfy the agreement?
-- How much of the work was completed?
-- Is the submitted evidence sufficient?
-
-AgentCourt delegates this evidence-based adjudication problem to GenLayer and uses the resulting structured decision in its settlement logic.
-
----
-
-## 🏗️ Architecture
-
-```text
-                  AUTONOMOUS COMMERCE
-                         │
-                         ▼
-                ┌──────────────────┐
-                │     Agreement    │
-                └────────┬─────────┘
-                         │
-                         ▼
-                ┌──────────────────┐
-                │  Funding State   │
-                └────────┬─────────┘
-                         │
-                         ▼
-                ┌──────────────────┐
-                │ Seller Delivery  │
-                └────────┬─────────┘
-                         │
-                         ▼
-                ┌──────────────────┐
-                │     Evidence     │
-                └────────┬─────────┘
-                         │
-                         ▼
-                ┌──────────────────┐
-                │     Dispute      │
-                └────────┬─────────┘
-                         │
-                         ▼
-              ┌──────────────────────┐
-              │      GenLayer       │
-              │     Adjudication    │
-              └──────────┬───────────┘
-                         │
-                  Structured Verdict
-                         │
-                         ▼
-              ┌──────────────────────┐
-              │ Deterministic        │
-              │ Settlement Logic     │
-              └──────────┬───────────┘
-                         │
-                         ▼
-                     Resolution
-```
-
----
-
-## 📋 Agreement Lifecycle
-
-```text
-CREATED
-   ↓
-FUNDED
-   ↓
-DELIVERED
-   ↓
-DISPUTED
-   ↓
-ADJUDICATING
-   ↓
-RESOLVED
-   ↓
-SETTLED
-```
-
-Each state makes the dispute process explicit and auditable.
-
----
-
-## ⚖️ Adjudication Model
-
-The adjudication result is structured and validated rather than accepted as arbitrary free-form output.
-
-Conceptual result:
-
-```json
-{
-  "verdict": "PARTIALLY_FULFILLED",
-  "completion": 70,
-  "confidence": 85,
-  "evidence_summary": "...",
-  "reasoning": "..."
-}
-```
-
-AgentCourt validates the returned values before accepting the adjudication result. The completion value is constrained to `0–100`.
-
----
-
-## 🔐 Smart Contract Operations
-
-```text
-create_agreement(...)
-fund_agreement(...)
-submit_delivery(...)
-open_dispute(...)
-adjudicate(...)
-settle(...)
-get_agreement(...)
-```
-
-These operations represent the agreement lifecycle from creation to resolution.
-
----
-
-## 💡 Example Use Case
-
-Imagine two autonomous agents:
-
-**Buyer Agent**
-
-> Create a competitive analysis of 20 companies and deliver the final report before the deadline.
-
-**Seller Agent**
-
-Accepts the agreement and submits the report.
-
-**Dispute**
-
-The buyer claims that only 14 companies were analyzed and required sections are missing. The seller claims the research was substantially completed.
-
-AgentCourt collects:
-
-```text
-Agreement Terms
-       +
-Seller Delivery
-       +
-Evidence
-       +
-Buyer Claim
-       +
-Seller Claim
-```
-
-GenLayer evaluates the dispute and can return, for example:
-
-```text
-Verdict: PARTIALLY_FULFILLED
-Completion: 70%
-```
-
-The settlement logic then deterministically calculates the corresponding allocation and refund.
-
----
-
-## 🧪 Tests
-
-The repository includes direct and integration tests covering the core lifecycle and failure paths, including:
-
-- agreement creation and lifecycle transitions
-- funding and delivery flow
-- dispute handling
-- GenLayer adjudication with structured verdict validation
-- deterministic settlement calculation
-- rejection and invalid-state cases
-- deployment/integration smoke testing
-
-The adjudication/settlement tests also exercise a mocked structured GenLayer result such as `PARTIALLY_FULFILLED` at `70%` completion to verify settlement accounting.
-
----
-
-## 🌐 GenLayer Integration
-
-AgentCourt uses GenLayer's nondeterministic execution capability for dispute adjudication.
-
-Conceptually:
-
-```text
-Evidence
-   ↓
-GenLayer Evaluation
-   ↓
-Structured Verdict
-   ↓
-Validation
-   ↓
-Settlement Logic
-```
-
-The contract does not attempt to determine subjective fulfillment itself.
-
-**GenLayer evaluates the dispute.**
-
-**AgentCourt applies the resulting settlement logic.**
-
----
-
-## 📍 Deployment
-
-AgentCourt is deployed on **GenLayer Studio Dev**.
-
-| Property | Value |
+| Status | Meaning |
 |---|---|
-| Network | GenLayer Studio Dev |
-| Chain ID | `61997` |
-| RPC | `https://studio-dev.genlayer.com/api` |
-| Contract | `0x0C7609876C68418E3A949da0FCaDEd265c79d7ce` |
-| Deployment Tx | `0x1794c95d3f2c5e93924735a7630e602e9f5444bbfc0566dbd0e26861450d5a1a` |
-
-### Contract Explorer
-
-[View AgentCourt Contract on GenLayer Explorer](https://explorer-studio-dev.genlayer.com/address/0x0C7609876C68418E3A949da0FCaDEd265c79d7ce)
+| `CREATED` | Agreement recorded, not yet funded |
+| `FUNDED` | Buyer has committed; seller can deliver until the deadline |
+| `DELIVERED` | Evidence submitted; the 3-day dispute window is open |
+| `DISPUTED` | Buyer disputed the delivery; waiting for adjudication |
+| `RESOLVED` | Verdict and completion are final; `resolution` records how |
+| `SETTLED` | Settlement accounting has been computed and recorded |
 
 ---
 
-## 📊 Project Status
+## How adjudication works
 
-**MVP — AgentCourt V0.1**
+`adjudicate` runs a single `gl.vm.run_nondet` block.
 
-The current implementation demonstrates the complete conceptual dispute lifecycle:
+1. **Leader.** If the evidence contains a URL, the leader renders it with `gl.nondet.web.render`. It builds the prompt and calls `gl.nondet.exec_prompt` with `response_format="json"`.
+2. **Validators re-judge.** Each validator renders the URL and runs the prompt on its own model. It accepts the leader's result only if:
+   - the leader's ruling is well formed and internally consistent, and
+   - the validator reached the **same verdict**, with a **completion percentage within 10 points**.
 
-```text
-Agreement
-→ Funding State
-→ Delivery
-→ Evidence
-→ Dispute
-→ Adjudication
-→ Resolution
-→ Settlement Accounting
+   A validator never accepts a ruling just because it is valid JSON.
+3. **Verdict and completion must agree.** Settlement pays the seller by completion percentage, so the contract derives one from the other:
+
+   | Verdict | Completion used for settlement |
+   |---|---|
+   | `FULFILLED` | 100 |
+   | `PARTIALLY_FULFILLED` | 1–99 (the model's value, clamped) |
+   | `NOT_FULFILLED` | 0 |
+   | `UNDETERMINED` | 0, so the burden of proof is on the seller |
+
+4. **Party text is fenced.** Terms, claims, evidence and fetched pages sit between `<<<BEGIN …>>>` / `<<<END …>>>` markers. The prompt tells the model to treat everything inside them as data and to ignore any instructions it contains. Input sizes are bounded: terms and evidence 4,000 characters, claims 2,000, fetched page 6,000, stored reasoning 1,000.
+
+Malformed model output (an unknown verdict, out-of-range numbers, missing fields) aborts the transaction, and the agreement stays `DISPUTED`.
+
+---
+
+## Contract interface
+
+| Method | Caller | Effect |
+|---|---|---|
+| `create_agreement(seller, terms, amount, deadline)` | buyer | Records an agreement. `seller` must be a valid address other than the buyer; `deadline` is a future Unix timestamp. Returns the agreement ID. |
+| `fund_agreement(id)` | buyer | `CREATED → FUNDED` |
+| `submit_delivery(id, evidence, seller_claim)` | seller | `FUNDED → DELIVERED`, only before the deadline |
+| `accept_delivery(id)` | buyer | `DELIVERED → RESOLVED` as `FULFILLED` |
+| `finalize_undisputed(id)` | anyone | `DELIVERED → RESOLVED` as `FULFILLED`, after the dispute window |
+| `reclaim_expired(id)` | buyer | `FUNDED → RESOLVED` as `NOT_FULFILLED`, after a missed deadline |
+| `open_dispute(id, buyer_claim)` | buyer | `DELIVERED → DISPUTED`, within the dispute window |
+| `adjudicate(id)` | buyer or seller | `DISPUTED → RESOLVED` through GenLayer consensus |
+| `settle(id)` | anyone | `RESOLVED → SETTLED`; returns `seller_amount`, `buyer_refund`, `verdict`, `resolution` |
+| `get_agreement(id)` | view | Full agreement state, including the stored ruling |
+| `get_agreement_count()` | view | Number of agreements created |
+
+Time checks use the transaction datetime that GenVM exposes to the contract, so every validator evaluates them identically.
+
+---
+
+## Scope of this version
+
+- **No custody.** `fund_agreement` records a state change, and `settle` records how much the seller and buyer are owed. The contract does not hold or transfer GEN or tokens; payment rails would be wired to the settlement result.
+- **One evidence URL.** Only the first URL in the evidence is fetched.
+- **Single adjudication.** There is no appeal step inside the contract beyond GenLayer's own consensus rotations.
+
+---
+
+## Running locally
+
+### Tests
+
+The tests run in GenLayer's direct mode, with mocked LLM and web responses, against the GenVM v0.6 SDK that Studio uses.
+
+```bash
+python3 -m venv .venv
+.venv/bin/pip install -r requirements-dev.txt
+.venv/bin/python -m pytest tests
 ```
 
-The prototype focuses on the core architecture for dispute resolution in autonomous commerce. Asset custody and actual token movement are intentionally outside the current MVP.
+The first run downloads the GenVM v0.6.0-rc8 runner bundle (about 300 MB) into `~/.cache/gltest-direct`.
 
----
+The suite covers the full lifecycle and the following:
 
-## 🛣️ Roadmap
+- validators rejecting a different verdict, a completion outside tolerance, a tampered leader result, or a leader error
+- verdict and completion consistency, and malformed model output
+- evidence URLs reaching the prompt, unreachable URLs, and fenced party text
+- the delivery deadline, the dispute window, buyer acceptance and expiry refunds
+- access control and double settlement
+- picklability of the `run_nondet` closures
 
-Future versions can extend AgentCourt with:
+`tests/test_agentcourt_integration.py` deploys to a local GenLayer node at `http://127.0.0.1:4000/api` and is skipped when none is running.
 
-- production-grade asset custody and payment rails
-- richer evidence formats
-- more sophisticated agreement templates
-- agent identity and reputation
-- multi-party agreements
-- automated dispute triggering
-- additional settlement mechanisms
-- reusable adjudication policies
-- integrations with agent marketplaces
+### Run the demo on Studio
 
----
+Requires Node.js 20 or newer.
 
-## 🎯 The Bigger Picture
-
-As agents increasingly act on behalf of people and organizations, commerce needs more than discovery, execution, and payment.
-
-It also needs a way to handle disagreements when autonomous parties interpret an agreement differently.
-
-AgentCourt explores that missing layer:
-
-```text
-Agent Discovery
-      ↓
-Agreement
-      ↓
-Execution
-      ↓
-Evidence
-      ↓
-Dispute Resolution
-      ↓
-Settlement
+```bash
+npm install
+npm run demo        # deploys a fresh contract and runs all three agreements
+npm run report      # rewrites demo/RUN.md from the recorded receipts
 ```
 
-> **Autonomous commerce needs autonomous dispute resolution.**
+The demo funds two throwaway accounts through Studio's `sim_fundAccount` and stores their keys in `.demo-accounts.json`, which is git-ignored. Options:
+
+| Variable | Effect |
+|---|---|
+| `NETWORK=studionet` | Use `https://studio.genlayer.com/api` instead of Studio Dev |
+| `CONTRACT_ADDRESS=0x…` | Reuse a deployed contract |
+| `SCENARIOS=partial,web,accept` | Run a subset of the agreements |
+| `BUYER_PRIVATE_KEY`, `SELLER_PRIVATE_KEY` | Use your own accounts |
+
+The demo uses `genlayer-js` 2.0, which sends the fee distribution that Studio Dev now requires. Each transaction requests 10× Studio's default execution budget, because adjudication renders a web page and runs an LLM on every validator.
 
 ---
 
-## 📁 Repository Structure
+## Repository structure
 
 ```text
-AgentCourt/
-├── contracts/
-├── tests/
-├── gltest.config.yaml
-└── README.md
+contracts/AgentCourt.py   Intelligent Contract
+tests/                    direct-mode tests and localnet deploy test
+scripts/demo.mjs          end-to-end run on GenLayer Studio
+scripts/report.mjs        builds demo/RUN.md from recorded runs
+demo/RUN.md               verified on-chain run with all transaction hashes
+demo/runs/                raw receipts of each run
 ```
-
-The repository contains the smart-contract implementation, test suite, GenLayer configuration, and project documentation.
 
 ---
 
-## 🔗 Project Links
+## Roadmap
 
-**GitHub**
+- Custody and payout of GEN or ERC-20 tokens driven by `settle`
+- Multiple evidence URLs and file evidence
+- An appeal step with additional evidence for `UNDETERMINED` rulings
+- Agent identity and reputation derived from settled agreements
 
-[AgentCourt Repository](https://github.com/TurgayAcar49/AgentCourt)
+## License
 
-**GenLayer Explorer**
-
-[AgentCourt Contract](https://explorer-studio-dev.genlayer.com/address/0x0C7609876C68418E3A949da0FCaDEd265c79d7ce)
-
-**License**
-
-[MIT License](LICENSE)
-
----
-
-## ⚖️ Core Principle
-
-```text
-GenLayer decides.
-
-The smart contract executes the decision logic.
-
-AgentCourt connects the two.
-```
-
-### AgentCourt
-
-**The dispute layer for autonomous commerce.**
+[MIT](LICENSE)
