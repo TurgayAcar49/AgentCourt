@@ -1,4 +1,6 @@
-from genlayer import *
+# { "Depends": "py-genlayer:latest" }
+
+import genlayer as gl
 import datetime
 import re
 import typing
@@ -63,21 +65,21 @@ ADDRESS_PATTERN = re.compile(r"0x[0-9a-f]{40}")
 URL_PATTERN = re.compile(r"https?://\S+")
 
 
-@allow_storage
+@gl.storage.allow
 @dataclass
 class Agreement:
     buyer: str
     seller: str
     terms: str
-    amount: bigint
-    deadline: bigint
-    delivered_at: bigint
+    amount: gl.bigint
+    deadline: gl.bigint
+    delivered_at: gl.bigint
     evidence: str
     seller_claim: str
     buyer_claim: str
     verdict: str
-    completion_percent: bigint
-    confidence: bigint
+    completion_percent: gl.bigint
+    confidence: gl.bigint
     evidence_summary: str
     reasoning: str
     resolution: str
@@ -284,14 +286,14 @@ def _rulings_agree(leader: dict, mine: dict) -> bool:
     return difference <= COMPLETION_TOLERANCE
 
 
-class AgentCourt(gl.Contract):
+class AgentCourt(gl.contract.Contract):
 
     # ---------------------------------------------------------
     # Persistent storage
     # ---------------------------------------------------------
 
-    next_agreement_id: bigint
-    agreements: TreeMap[str, Agreement]
+    next_agreement_id: gl.bigint
+    agreements: gl.storage.TreeMap[str, Agreement]
 
     STATUS_CREATED = STATUS_CREATED
     STATUS_FUNDED = STATUS_FUNDED
